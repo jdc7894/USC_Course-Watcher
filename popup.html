@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>USC Course Availability Watcher</title>
+    <link type="text/css" href="css/custom-theme/jquery-ui-1.8.2.custom.css" rel="Stylesheet" />
+    <script type="text/javascript" src="jquery/jquery-1.11.1.min.js"></script>
+    <script type="text/javascript" src="jquery/jquery-ui-1.8.2.custom.min.js"></script>
+    <script type="text/javascript" src="js/main.js"></script>
+</head> 
+
+<body> 
+	<div style="width: 720px; font-size: small;">
+	  <div id="tabs" style="height: 350px; ">
+		<ul>
+			<li><a href="#tabs-1">Register Class</a></li>
+            <li><a href="#tabs-2">Course Availability</a></li>
+		</ul>
+            <div id="tabs-1"> 
+              <br>
+              <label for="school">Select School</label>
+              <select name="school" id="school">
+                    <option selected = "selected" value="pick">Please select school </option>
+                    <option value="dornslife">Dornslife College of Letters,Arts and Sciences</option>
+                    <option value="leventhal">Leventhal School of Accounting</option>
+                    <option value="arch">Architecture</option>
+                    <option value="rosk">Roski School of Art and Design</option>
+                    <option value="acad">Arts,Technology and the Business of Innovation</option>
+                    <option value="marshall">Marshall School of Business</option>
+                    <option value="cinema">Cinematic Arts</option>
+                    <option value="annenberg">Annenberg School for Communication</option>
+                    <option value="dance">Kaufman School of Dance</option>
+                    <option value="ostrow">Ostrow School of Dentistry </option>
+                    <option value="thtr">Dramatic Arts</option>
+                    <option value="education">Rossier School of Education</option>
+                    <option value="viterbi">Viterbi School of Engineerging</option>
+                    <option value="ge">General Education</option>
+                    <option value="gero">Davis School of Gerontology</option>
+                    <option value="grsc">Graduate Studies</option>
+                    <option value="law">Law</option>
+                    <option value="keck">Keck School of Medicine</option>
+                    <option value="music">Thornton School of Music </option>
+                    <option value="ot">Occupational Science and Occupational Therapy</option>
+                    <option value="pharm">Pharmacy</option>
+                    <option value="pt">Physical Therapy</option>
+                    <option value="price">Price School of Public Policy</option>
+                    <option value="social">Social Work</option>
+
+              </select>
+              <select name="department" id = "department">
+              </select>
+              <br><br>
+            <h3> Enter the class section id (class number)</h3><br>
+            <a href="" id = 'find-section'>
+                        Click here to find section id</a> &nbsp; 
+            <input id="textMemberID" type="text" style="height:10px" />
+                <br />
+                <br />
+                <div class="save">
+                    <button id="saveOptionsOnExtension">
+                        Watch for this class</button></div>
+                <br />
+                <div id="save_status" style="color: #FF0000">
+                </div>
+                <br />
+        </div>
+		<div id="tabs-2" style="padding-left: 5px">
+			<table style="width: 720px; " id="main_table">
+                    <tr style="text-align: center">
+                        <th>
+                            Class Name
+                        </th>
+                        <th>
+                            Section number
+                        </th>
+                        <th>
+                            Class Type
+                        </th>
+                        <th>
+                            Availability
+                        </th>
+                        <th>
+                        	Delete
+                        </th>
+                    </tr>
+             </table>
+		</div>
+
+	   </div>
+	</div>
+	 <div id="holdingdata" style="visibility: hidden; height: 0; width: 0; display: none;"></div>
+
+</body>
+
+
+</html>
