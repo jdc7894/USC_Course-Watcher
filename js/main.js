@@ -1,10 +1,10 @@
 var url_selection = "";
+var semesterValue = ""; 
 var once = true; 
 var valid = true; 
 var raw = "";
 var school_clicked = false; 
 var department_clicked = false; 
-//jQuery.ajaxSetup({async:false});
 
 $(document).ready(function () {
     /* Listeners for buttons */
@@ -13,28 +13,21 @@ $(document).ready(function () {
     $('#saveOptionsOnExtension').click(function () { save_options(); });
     fetch_feed();
     setup_school();
+    setup_term(); 
     setup_department();
 });
 
 function fetch_feed() {
     chrome.runtime.sendMessage({greeting:"hello",url:localStorage}, function(response) {
+    
     });
-}
-
-function notify_user() {
-    var opt = {
-       type: "basic",
-       title: "Deploy",
-       message: "This class is now full!",
-       iconUrl: "bob48.png"
-    };
-    chrome.notifications.create("",opt,function(id) {});
 }
 
 function save_options() {
     var new_section = textMemberID.value; 
     new_section = new_section.replace('R', '');
     new_section = new_section.replace('D', '');
+
     if(!new_section) {
         document.getElementById("save_status").innerHTML = "You need to provide a section id!"; 
         return; 
@@ -47,16 +40,15 @@ function save_options() {
         document.getElementById("save_status").innerHTML = "You have to select the department name!";
         return;
     }
-    $.get("http://classes.usc.edu/term-20151/classes/" + url_selection, function (data) {
-        if(check_valid_section(data,new_section) == false) {
+    $.get("http://classes.usc.edu/term-" + semesterValue + "/classes/" + url_selection, function (data) {
+        if(isValidSection(data,new_section) == false) {
             valid = false; 
             document.getElementById("save_status").innerHTML = "The section id is invalid. Please try again"; 
-        }
-        else {
+        } else {
             if(localStorage.hasOwnProperty(new_section)) {      // element does not show up in the list now
                 document.getElementById("save_status").innerHTML = "You already signed up for this section";
             } else {
-                localStorage[new_section] = "http://classes.usc.edu/term-20151/classes/" + url_selection;
+                localStorage[new_section] = "http://classes.usc.edu/term-" + semesterValue + "/classes/" + url_selection;
                 document.getElementById("save_status").innerHTML = "section: " + new_section + " is saved to the watched list.";
                 reload_Page();
             }
@@ -64,22 +56,28 @@ function save_options() {
     }); 
 }
 
-function check_valid_section(rawData, session) {
+/* Check if the user provided section id is valid or not */
+function isValidSection(rawData, session) {
     if(raw != rawData) {
-    raw = rawData;
-    holdingdata.innerHTML = raw;
-    /* Needed for parsing to work! */
-    var theNode = document.getElementById("About");
+        raw = rawData;
+        holdingdata.innerHTML = raw;
+        /* Needed for parsing to work! */
+        var theNode = document.getElementById("About");
         if (theNode) {
             holdingdata.innerHTML = "";
             holdingdata.appendChild(theNode);
         }
     }
+    
     var new_session = "." + session;
     var current_row = 'tr' + new_session;
     var class_name = $(new_session).parents("div:eq(1)").attr("id");
-    if(typeof class_name == 'undefined') return false; 
-    else return true; 
+    
+    if(typeof class_name == 'undefined') {
+        return false; 
+    } else {
+        return true; 
+    }
 }
 
 /* Should be called from background.html */
@@ -87,13 +85,13 @@ function reload_Page() {
     $('#main_table').find("tr:gt(0)").remove();
     $.each(localStorage, function(key,value) {
         var xhr = new XMLHttpRequest();
-         xhr.open("GET", value, true);
+        xhr.open("GET", value, true);
         xhr.onreadystatechange = function() {
             if (xhr.readyState == 4) {
               setCourseData(xhr.responseText,key);
             }
         }
-     xhr.send();
+        xhr.send();
     });
 }
 
@@ -132,595 +130,31 @@ function setCourseData(rawData, session) {
     }
 
 function clickHandler(e) {
-    chrome.tabs.update({url:"http://classes.usc.edu/term-20151/classes/"+url_selection});
-    window.close(); // Note: window.close(), not this.close()
+    chrome.tabs.update({url:"http://classes.usc.edu/term-" +  semesterValue + "/classes/"+url_selection});
+    window.close(); 
 }
 
 document.addEventListener('DOMContentLoaded', function () {
     chrome.alarms.create("myAlarm", {delayInMinutes: 0.2} );
     document.getElementById('find-section').addEventListener('click', clickHandler);
-
 });
+
+function setup_term() {
+    $("#term").change(function() {
+        if($("#term").val() == "spring") {
+            semesterValue = "20151"; 
+        } else if($("#term").val() == "summer") {
+            semesterValue = "20152";
+        } else if($("#term").val() == "fall") {
+            semesterValue = "20153"; 
+        }
+    });
+}
 
 function setup_department() {
     $("#department").change(function() {
         department_clicked = true;
-        if($("#department").val() == "ali") {
-            url_selection = "ali";
-        }
-        if($("#department").val() == "amst") {
-            url_selection = "amst";
-        }
-        if($("#department").val() == "anth") {
-            url_selection = "anth";
-        }
-        if($("#department").val() == "ahis") {
-            url_selection = "ahis";
-        }
-        if($("#department").val() == "astr") {
-            url_selection = "astr";
-        }
-        if($("#department").val() == "bisc") {
-            url_selection = "bisc";
-        }
-        if($("#department").val() == "chem") {
-            url_selection = "chem";
-        }
-        if($("#department").val() == "clas") {
-            url_selection = "clas";
-        }
-        if($("#department").val() == "colt") {
-            url_selection = "colt";
-        }
-        if($("#department").val() == "cslc") {
-            url_selection = "cslc";
-        }
-        if($("#department").val() == "ealc") {
-            url_selection = "ealc";
-        }
-        if($("#department").val() == "easc") {
-            url_selection = "easc";
-        }
-        if($("#department").val() == "econ") {
-            url_selection = "econ";
-        }
-        if($("#department").val() == "engl") {
-            url_selection = "engl";
-        }
-        if($("#department").val() == "enst") {
-            url_selection = "enst";
-        }
-        if($("#department").val() == "fren") {
-            url_selection = "fren";
-        }
-        if($("#department").val() == "fsem") {
-            url_selection = "fsem";
-        }
-        if($("#department").val() == "swms") {
-            url_selection = "swms";
-        }
-        if($("#department").val() == "geog") {
-            url_selection = "geog";
-        }
-        if($("#department").val() == "geol") {
-            url_selection = "geol";
-        }
-        if($("#department").val() == "germ") {
-            url_selection = "germ";
-        }
-        if($("#department").val() == "gr") {
-            url_selection = "gr";
-        }
-        if($("#department").val() == "hebr") {
-            url_selection = "hebr";
-        }
-        if($("#department").val() == "hist") {
-            url_selection = "hist";
-        }
-        if($("#department").val() == "hbio") {
-            url_selection = "hbio";
-        }
-        if($("#department").val() == "inds") {
-            url_selection = "inds";
-        }
-        if($("#department").val() == "ir") {
-            url_selection = "ir";
-        }
-        if($("#department").val() == "ital") {
-            url_selection = "ital";
-        }
-        if($("#department").val() == "js") {
-            url_selection = "js";
-        }
-        if($("#department").val() == "lat") {
-            url_selection = "lat";
-        }
-        if($("#department").val() == "lbst") {
-            url_selection = "lbst";
-        }
-        if($("#department").val() == "ling") {
-            url_selection = "ling";
-        }
-        if($("#department").val() == "mpw") {
-            url_selection = "mpw";
-        }
-        if($("#department").val() == "math") {
-            url_selection = "math";
-        }
-        if($("#department").val() == "mdes") {
-            url_selection = "mdes";
-        }
-        if($("#department").val() == "mda") {
-            url_selection = "mda";
-        }
-        if($("#department").val() == "neur") {
-            url_selection = "neur";
-        }
-        if($("#department").val() == "nsci") {
-            url_selection = "nsci";
-        }
-        if($("#department").val() == "os") {
-            url_selection = "os";
-        }
-        if($("#department").val() == "phil") {
-            url_selection = "phil";
-        }
-        if($("#department").val() == "phed") {
-            url_selection = "phed";
-        }
-        if($("#department").val() == "phys") {
-            url_selection = "phys";
-        }
-        if($("#department").val() == "pepp") {
-            url_selection = "pepp";
-        }
-        if($("#department").val() == "posc") {
-            url_selection = "posc";
-        }
-        if($("#department").val() == "poir") {
-            url_selection = "poir";
-        }
-        if($("#department").val() == "port") {
-            url_selection = "port";
-        }
-        if($("#department").val() == "psyc") {
-            url_selection = "psyc";
-        }
-        if($("#department").val() == "rel") {
-            url_selection = "rel";
-        }
-        if($("#department").val() == "sll") {
-            url_selection = "sll";
-        }
-        if($("#department").val() == "soci") {
-            url_selection = "soci";
-        }
-        if($("#department").val() == "ssem") {
-            url_selection = "ssem";
-        }
-        if($("#department").val() == "span") {
-            url_selection = "span";
-        }
-        if($("#department").val() == "ssci") {
-            url_selection = "ssci";
-        }
-        if($("#department").val() == "core") {
-            url_selection = "core";
-        }
-        if($("#department").val() == "usc") {
-            url_selection = "usc";
-        }
-        if($("#department").val() == "writ") {
-            url_selection = "writ";
-        }
-        if($("#department").val() == "acct") {
-            url_selection = "acct";
-        }
-        if($("#department").val() == "arch") {
-            url_selection = "arch";
-        }
-        if($("#department").val() == "face") {
-            url_selection = "face";
-        }
-        if($("#department").val() == "facs") {
-            url_selection = "facs";
-        }
-        if($("#department").val() == "fadn") {
-            url_selection = "fadn";
-        }
-        if($("#department").val() == "fadw") {
-            url_selection = "fadw";
-        }
-        if($("#department").val() == "fa") {
-            url_selection = "fa";
-        }
-        if($("#department").val() == "fain") {
-            url_selection = "fain";
-        }
-        if($("#department").val() == "fapt") {
-            url_selection = "fapt";
-        }
-        if($("#department").val() == "faph") {
-            url_selection = "faph";
-        }
-        if($("#department").val() == "fapr") {
-            url_selection = "fapr";
-        }
-        if($("#department").val() == "pas") {
-            url_selection = "pas";
-        }
-        if($("#department").val() == "fasc") {
-            url_selection = "fasc";
-        }
-        if($("#department").val() == "acad") {
-            url_selection = "acad";
-        }
-        if($("#department").val() == "buad") {
-            url_selection = "buad";
-        }
-        if($("#department").val() == "buco") {
-            url_selection = "buco";
-        }
-        if($("#department").val() == "baep") {
-            url_selection = "baep";
-        }
-        if($("#department").val() == "dso") {
-            url_selection = "dso";
-        }
-        if($("#department").val() == "fbe") {
-            url_selection = "fbe";
-        }
-        if($("#department").val() == "gsba") {
-            url_selection = "gsba";
-        }
-        if($("#department").val() == "lim") {
-            url_selection = "lim";
-        }
-        if($("#department").val() == "mor") {
-            url_selection = "mor";
-        }
-        if($("#department").val() == "mkt") {
-            url_selection = "mkt";
-        }
-        if($("#department").val() == "ctan") {
-            url_selection = "ctan";
-        }
-        if($("#department").val() == "cntv") {
-            url_selection = "cntv";
-        }
-        if($("#department").val() == "ctcs") {
-            url_selection = "ctcs";
-        }
-        if($("#department").val() == "ctin") {
-            url_selection = "ctin";
-        }
-        if($("#department").val() == "iml") {
-            url_selection = "iml";
-        }
-        if($("#department").val() == "cmpp") {
-            url_selection = "cmpp";
-        }
-        if($("#department").val() == "ctpr") {
-            url_selection = "ctpr";
-        }
-        if($("#department").val() == "ctwr") {
-            url_selection = "ctwr";
-        }
-        if($("#department").val() == "comm") {
-            url_selection = "comm";
-        }
-        if($("#department").val() == "cmgt") {
-            url_selection = "cmgt";
-        }
-        if($("#department").val() == "dsm") {
-            url_selection = "dsm";
-        }
-        if($("#department").val() == "jour") {
-            url_selection = "jour";
-        }
-        if($("#department").val() == "pubd") {
-            url_selection = "pubd";
-        }
-        if($("#department").val() == "danc") {
-            url_selection = "danc";
-        }
-        if($("#department").val() == "cby") {
-            url_selection = "cby";
-        }
-        if($("#department").val() == "dhyg") {
-            url_selection = "dhyg";
-        }
-        if($("#department").val() == "dpbl") {
-            url_selection = "dpbl";
-        }
-        if($("#department").val() == "dent") {
-            url_selection = "dent";
-        }
-        if($("#department").val() == "gden") {
-            url_selection = "gden";
-        }
-        if($("#department").val() == "gspd") {
-            url_selection = "gspd";
-        }
-        if($("#department").val() == "diag") {
-            url_selection = "diag";
-        }
-        if($("#department").val() == "ofpm") {
-            url_selection = "ofpm";
-        }
-        if($("#department").val() == "pedo") {
-            url_selection = "pedo";
-        }
-        if($("#department").val() == "peri") {
-            url_selection = "peri";
-        }
-        if($("#department").val() == "thtr") {
-            url_selection = "thtr";
-        }
-        if($("#department").val() == "educ") {
-            url_selection = "educ";
-        }
-        if($("#department").val() == "edco") {
-            url_selection = "edco";
-        }
-        if($("#department").val() == "edpt") {
-            url_selection = "edpt";
-        }
-        if($("#department").val() == "edhp") {
-            url_selection = "edhp";
-        }
-        if($("#department").val() == "ame") {
-            url_selection = "ame";
-        }
-        if($("#department").val() == "aste") {
-            url_selection = "aste";
-        }
-        if($("#department").val() == "bme") {
-            url_selection = "bme";
-        }
-        if($("#department").val() == "che") {
-            url_selection = "che";
-        }
-        if($("#department").val() == "ce") {
-            url_selection = "ce";
-        }
-        if($("#department").val() == "csci") {
-            url_selection = "csci";
-        }
-        if($("#department").val() == "ee") {
-            url_selection = "ee";
-        }
-        if($("#department").val() == "engr") {
-            url_selection = "engr";
-        }
-        if($("#department").val() == "ene") {
-            url_selection = "ene";
-        }
-        if($("#department").val() == "ise") {
-            url_selection = "ise";
-        }
-        if($("#department").val() == "inf") {
-            url_selection = "inf";
-        }
-        if($("#department").val() == "itp") {
-            url_selection = "itp";
-        }
-        if($("#department").val() == "masc") {
-            url_selection = "masc";
-        }
-        if($("#department").val() == "pte") {
-            url_selection = "pte";
-        }
-        if($("#department").val() == "sae") {
-            url_selection = "sae";
-        }
-        if($("#department").val() == "wct") {
-            url_selection = "wct";
-        }
-        if($("#department").val() == "gct") {
-            url_selection = "gct";
-        }
-        if($("#department").val() == "scin") {
-            url_selection = "scin";
-        }
-        if($("#department").val() == "scis") {
-            url_selection = "scis";
-        }
-        if($("#department").val() == "arlt") {
-            url_selection = "arlt";
-        }
-        if($("#department").val() == "si") {
-            url_selection = "si";
-        }
-        if($("#department").val() == "gero") {
-            url_selection = "gero";
-        }
-        if($("#department").val() == "grsc") {
-            url_selection = "grsc";
-        }
-        if($("#department").val() == "law") {
-            url_selection = "law";
-        }
-        if($("#department").val() == "acmd") {
-            url_selection = "acmd";
-        }
-        if($("#department").val() == "amed") {
-            url_selection = "amed";
-        }
-        if($("#department").val() == "anst") {
-            url_selection = "anst";
-        }
-        if($("#department").val() == "bioc") {
-            url_selection = "bioc";
-        }
-        if($("#department").val() == "cbg") {
-            url_selection = "cbg";
-        }
-        if($("#department").val() == "cnb") {
-            url_selection = "cnb";
-        }
-        if($("#department").val() == "dsr") {
-            url_selection = "dsr";
-        }
-        if($("#department").val() == "hp") {
-            url_selection = "hp";
-        }
-        if($("#department").val() == "intd") {
-            url_selection = "intd";
-        }
-        if($("#department").val() == "medb") {
-            url_selection = "medb";
-        }
-        if($("#department").val() == "meds") {
-            url_selection = "meds";
-        }
-        if($("#department").val() == "med") {
-            url_selection = "med";
-        }
-        if($("#department").val() == "mbio") {
-            url_selection = "mbio";
-        }
-        if($("#department").val() == "micb") {
-            url_selection = "micb";
-        }
-        if($("#department").val() == "mss") {
-            url_selection = "mss";
-        }
-        if($("#department").val() == "path") {
-            url_selection = "path";
-        }
-        if($("#department").val() == "phbi") {
-            url_selection = "phbi";
-        }
-        if($("#department").val() == "pm") {
-            url_selection = "pm";
-        }
-        if($("#department").val() == "pcpa") {
-            url_selection = "pcpa";
-        }
-        if($("#department").val() == "pthl") {
-            url_selection = "pthl";
-        }
-        if($("#department").val() == "scrm") {
-            url_selection = "scrm";
-        }
-        if($("#department").val() == "artl") {
-            url_selection = "artl";
-        }
-        if($("#department").val() == "mucm") {
-            url_selection = "mucm";
-        }
-        if($("#department").val() == "muco") {
-            url_selection = "muco";
-        }
-        if($("#department").val() == "mucd") {
-            url_selection = "mucd";
-        }
-        if($("#department").val() == "mujz") {
-            url_selection = "mujz";
-        }
-        if($("#department").val() == "musc") {
-            url_selection = "musc";
-        }
-        if($("#department").val() == "mued") {
-            url_selection = "mued";
-        }
-        if($("#department").val() == "muen") {
-            url_selection = "muen";
-        }
-        if($("#department").val() == "muhl") {
-            url_selection = "muhl";
-        }
-        if($("#department").val() == "muin") {
-            url_selection = "muin";
-        }
-        if($("#department").val() == "mtec") {
-            url_selection = "mtec";
-        }
-        if($("#department").val() == "mpem") {
-            url_selection = "mpem";
-        }
-        if($("#department").val() == "mpgu") {
-            url_selection = "mpgu";
-        }
-        if($("#department").val() == "mpks") {
-            url_selection = "mpks";
-        }
-        if($("#department").val() == "mppm") {
-            url_selection = "mppm";
-        }
-        if($("#department").val() == "mpst") {
-            url_selection = "mpst";
-        }
-        if($("#department").val() == "mpva") {
-            url_selection = "mpva";
-        }
-        if($("#department").val() == "mpwp") {
-            url_selection = "mpwp";
-        }
-        if($("#department").val() == "mscr") {
-            url_selection = "mscr";
-        }
-        if($("#department").val() == "ot") {
-            url_selection = "ot";
-        }
-        if($("#department").val() == "cxpt") {
-            url_selection = "cxpt";
-        }
-        if($("#department").val() == "hcda") {
-            url_selection = "hcda";
-        }
-        if($("#department").val() == "mptx") {
-            url_selection = "mptx";
-        }
-        if($("#department").val() == "pmep") {
-            url_selection = "pmep";
-        }
-        if($("#department").val() == "psci") {
-            url_selection = "psci";
-        }
-        if($("#department").val() == "phrd") {
-            url_selection = "phrd";
-        }
-        if($("#department").val() == "rsci") {
-            url_selection = "rsci";
-        }
-        if($("#department").val() == "bkn") {
-            url_selection = "bkn";
-        }
-        if($("#department").val() == "pt") {
-            url_selection = "pt";
-        }
-        if($("#department").val() == "aest") {
-            url_selection = "aest";
-        }
-        if($("#department").val() == "hmgt") {
-            url_selection = "hmgt";
-        }
-        if($("#department").val() == "ms") {
-            url_selection = "ms";
-        }
-        if($("#department").val() == "naut") {
-            url_selection = "naut";
-        }
-        if($("#department").val() == "nsc") {
-            url_selection = "nsc";
-        }
-        if($("#department").val() == "ppd") {
-            url_selection = "ppd";
-        }
-        if($("#department").val() == "ppde") {
-            url_selection = "ppde";
-        }
-        if($("#department").val() == "red") {
-            url_selection = "red";
-        }
-        if($("#department").val() == "plus") {
-            url_selection = "plus";
-        }
-        if($("#department").val() == "sowk") {
-            url_selection = "sowk";
-        }
+        url_selection = $("#department").val();
     });
 
 }
