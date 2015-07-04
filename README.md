@@ -1,8 +1,8 @@
 # USC Course Watcher
-USC Course Watcher is a google chrome extension developed by Decheol Jeong. This program constantly checks (every minute) for a class availability from USC's web registration site and lets the user know if it finds at least one class with new opening. This program was created to help student like me to maximize their chances of getting into a full class. 
+USC Course Watcher is a Google chrome extension developed by Decheol Jeong. This program constantly checks (every minute) for a class availability from USC's web registration site and lets the user know if it finds at least one class with new opening. This program was created to help student like me to maximize their chances of getting into a full class. 
 
 # How to install
-You can download and install this extension here: https://chrome.google.com/webstore/detail/usc-course-watcher/dpkcmpfeohfppbgflelbkemojphgjdhf?hl=en
+You can download and install this extension [here](https://chrome.google.com/webstore/detail/usc-course-watcher/dpkcmpfeohfppbgflelbkemojphgjdhf?hl=en): 
 
 # How to use
 Watch you class easily by selecting the department name and providing the section number for the class.  If at least one of the classes you registered to USC Course Watcher is available, it will send you a notification instantly.
